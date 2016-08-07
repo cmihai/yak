@@ -4,10 +4,15 @@ source src/yak.tcl
 
 proc assert {what} {
 	if {![eval "expr \{$what\}"]} {
-		puts "FAILED: $what"
+		set msg "FAILED: $what"
 	} else {
-		puts "SUCCESS: $what"
+		set msg "SUCCESS: $what"
 	}
+
+	if {[string length $msg] > 80} {
+		set msg "[string range $msg 0 80]..."
+	}
+	puts $msg
 }
 
 yak parse "-a" [list -a]
@@ -30,3 +35,8 @@ yak parse "-a|--ant=VALUE -b=STATUS -c|--codfish" [list --ant 5 -b {To be done}]
 assert {[yak get --ant] == 5}
 assert {[yak get -b] eq {To be done}}
 assert {![yak get --codfish]}
+
+catch {
+	yak blah
+} result opts
+assert "\[dict get \{$opts\} -code\] != 0"

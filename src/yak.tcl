@@ -2,12 +2,8 @@
 
 namespace eval yak {
 	variable parsed;
-}
 
-proc yak {command args} {
-	if {$command eq "parse"} {
-		set pattern [lindex $args 0]
-		set arglist [lindex $args 1]
+	proc parse {pattern arglist} {
 		set template [dict create]
 
 		# Process the command-line pattern
@@ -56,10 +52,22 @@ proc yak {command args} {
 				}
 			}
 		}
-	} elseif {$command eq "get"} {
-		if {![dict exists $::yak::parsed $args]} {
+	}
+
+	proc get {arg} {
+		if {![dict exists $::yak::parsed $arg]} {
 			return false;
 		}
-		return [dict get $::yak::parsed $args]
+		return [dict get $::yak::parsed $arg]
+	}
+}
+
+proc yak {command args} {
+	if {$command eq "parse"} {
+		::yak::parse {*}$args
+	} elseif {$command eq "get"} {
+		return [::yak::get $args]
+	} else {
+		error "Invalid command: $command"
 	}
 }
