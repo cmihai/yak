@@ -22,6 +22,11 @@ yak parse "-a -b" [list -a -b]
 assert {[yak get -a]}
 assert {[yak get -b]}
 
-yak parse "-a|--arg" [list -a --arg]
+yak parse "-a|--ant" [list -a]
 assert {[yak get -a]}
-assert {[yak get --arg]}
+assert {[yak get --ant]}
+
+yak parse "-a|--ant=VALUE -b=STATUS -c|--codfish" [list --ant 5 -b {To be done}]
+assert {[yak get --ant] == 5}
+assert {[yak get -b] eq {To be done}}
+assert {![yak get --codfish]}

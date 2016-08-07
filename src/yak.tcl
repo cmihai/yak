@@ -12,10 +12,18 @@ proc yak {command args} {
 
 		# Process the command-line pattern
 		foreach arg $pattern {
-			set forms [list $arg]
-			set argParams [dict create -default true -argType ""]
+			set argParams [dict create -forms [list] -default true -argVar ""]
+
+			# Is it a flag or should it have a value?
+			if {[string match "*=*" $arg]} {
+				set idx [string first "=" $arg]
+				dict set argParams -argVar \
+					[string range $arg [expr {$idx + 1}] end]
+				set arg [string range $arg 0 [expr {$idx - 1}]]
+			}
 
 			# Does the argument come in long and short forms?
+			set forms [list $arg]
 			if {[string match "-*|-*" $arg]} {
 				set idx [string first "|" $arg]
 				set forms [list \
@@ -24,6 +32,7 @@ proc yak {command args} {
 				]
 			}
 
+			dict set argParams -forms $forms
 			foreach form $forms {
 				dict set template $form $argParams
 			}
@@ -31,11 +40,20 @@ proc yak {command args} {
 
 		# Parse the command-line arguments
 		set ::yak::parsed [dict create]
-		foreach arg $arglist {
+		for {set i 0} {$i < [llength $arglist]} {incr i} {
+			set arg [lindex $arglist $i]
+
 			if {[dict exists $template $arg]} {
-				dict set ::yak::parsed $arg [
-					dict get [dict get $template $arg] -default
-				]
+				set argtype [dict get $template $arg]
+				if {[dict get $argtype -argVar] eq ""} {
+					set value [dict get $argtype -default]
+				} else {
+					set value [lindex $arglist [incr i]]
+				}
+
+				foreach form [dict get $argtype -forms] {
+					dict set ::yak::parsed $form $value
+				}
 			}
 		}
 	} elseif {$command eq "get"} {
