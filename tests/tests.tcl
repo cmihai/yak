@@ -21,3 +21,7 @@ assert {![yak get -b]}
 yak parse "-a -b" [list -a -b]
 assert {[yak get -a]}
 assert {[yak get -b]}
+
+yak parse "-a|--arg" [list -a --arg]
+assert {[yak get -a]}
+assert {[yak get --arg]}

@@ -12,8 +12,21 @@ proc yak {command args} {
 
 		# Process the command-line pattern
 		foreach arg $pattern {
+			set forms [list $arg]
 			set argParams [dict create -default true -argType ""]
-			dict set template $arg $argParams
+
+			# Does the argument come in long and short forms?
+			if {[string match "-*|-*" $arg]} {
+				set idx [string first "|" $arg]
+				set forms [list \
+					[string range $arg 0 [expr {$idx - 1}]] \
+					[string range $arg [expr {$idx + 1}] end] \
+				]
+			}
+
+			foreach form $forms {
+				dict set template $form $argParams
+			}
 		}
 
 		# Parse the command-line arguments
