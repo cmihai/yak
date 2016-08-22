@@ -18,7 +18,3 @@ It supports simple POSIX-like command-line argument parsing for Tcl applications
 
 Basically, use `|` to separate short and long argument forms, and `=` to
 indicate that it's a value argument and not a flag.
-
-## Why should I use this instead of \<PACKAGE NAME HERE\>?
-
-I have no idea. Sorry.
